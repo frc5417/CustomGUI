@@ -6,6 +6,6 @@ package CustomGUI;
 public class App {
 
     public static void main(String[] args) {
-        new CustomGUI();
+        new CustomGUI(100, 10, 9);
     }
 }
