@@ -46,6 +46,7 @@ public class CustomGUI {
         button.setFont(new Font("Comic Sans MS", Font.BOLD, 36));
         button.setBackground(Color.RED);
         button.setForeground(Color.WHITE);
+        button.setFocusPainted(false);
         buttonConstraint = new GridBagConstraints();
         buttonConstraint.anchor = GridBagConstraints.CENTER;
         buttonConstraint.fill = GridBagConstraints.HORIZONTAL;
