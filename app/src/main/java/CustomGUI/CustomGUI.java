@@ -3,17 +3,15 @@ package CustomGUI;
 import javax.swing.*;
 import java.awt.*;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
-
 public class CustomGUI {
     private JFrame frame;
     private JPanel panel;
     private JLabel label;
     private JButton button;
+    private NetworkTableClient client;
 
     CustomGUI(){
+        client = new NetworkTableClient();
         frame = new JFrame();
         panel = new JPanel();
 
