@@ -1,15 +1,20 @@
 package CustomGUI;
 
 import javax.swing.*;
-import javax.swing.text.AttributeSet.ColorAttribute;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class CustomGUI {
     private JFrame frame;
-    private JPanel panel;
-    private JLabel label;
-    private JButton button;
+    private JPanel switchPanel;
+    private JPanel startPanel;
+    private JPanel protoPanel;
+    private JLabel startLabel;
+    private JButton startButton;
+
+    private CardLayout cl;
     
     private GridBagConstraints labelConstraint;
     private GridBagConstraints buttonConstraint;
@@ -19,20 +24,43 @@ public class CustomGUI {
     CustomGUI(int windowSize, int aspectLength, int aspectHeight){
         client = new NetworkTableClient();
         frame = new JFrame();
-        panel = new JPanel();
+        switchPanel = new JPanel();
+        startPanel = new JPanel();
+        protoPanel = new JPanel();
+        cl = new CardLayout();
 
         frame.setSize(setAspectRatioLength(aspectLength)*setWindowSize(windowSize), setAspectRatioHeight(aspectHeight)*setWindowSize(windowSize));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(panel);
+        frame.add(switchPanel);
+        startPanelInitialize(windowSize, aspectLength, aspectHeight);
+        protoPanelInitialize(windowSize, aspectLength, aspectHeight);
 
-        panel.setLayout(new GridBagLayout());
-        panel.setSize(new Dimension(setAspectRatioLength(aspectLength)*setWindowSize(windowSize), setAspectRatioHeight(aspectHeight)*setWindowSize(windowSize)));
-        panel.setBackground(Color.BLACK);
+        switchPanel.setLayout(cl);
+        switchPanel.add(startPanel, "START");
+        switchPanel.add(protoPanel, "PROTO");
+        cl.show(switchPanel, "START");
         
 
-        label = new JLabel("Welcome to the Prototype Dashboard", SwingConstants.CENTER);
-        label.setFont(new Font("Comic Sans MS", Font.BOLD, 36));
-        label.setForeground(Color.WHITE);
+
+        startButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                cl.show(switchPanel, "PROTO");
+            }
+        });
+       
+        frame.setVisible(true);
+    }
+
+    private void startPanelInitialize(int windowSize, int aspectLength, int aspectHeight){
+        startPanel.setLayout(new GridBagLayout());
+        startPanel.setSize(new Dimension(setAspectRatioLength(aspectLength)*setWindowSize(windowSize), setAspectRatioHeight(aspectHeight)*setWindowSize(windowSize)));
+        startPanel.setBackground(Color.BLACK);
+        
+
+        startLabel = new JLabel("Welcome to the Prototype Dashboard", SwingConstants.CENTER);
+        startLabel.setFont(new Font("Comic Sans MS", Font.BOLD, 36));
+        startLabel.setForeground(Color.WHITE);
         labelConstraint = new GridBagConstraints();
         labelConstraint.anchor = GridBagConstraints.PAGE_START;
         labelConstraint.fill = GridBagConstraints.HORIZONTAL;
@@ -40,13 +68,13 @@ public class CustomGUI {
         labelConstraint.ipady = 100;
         labelConstraint.gridx = 0;
         labelConstraint.gridy = 0;
-        panel.add(label, labelConstraint);
+        startPanel.add(startLabel, labelConstraint);
 
-        button = new JButton("Press to Continue");
-        button.setFont(new Font("Comic Sans MS", Font.BOLD, 36));
-        button.setBackground(Color.RED);
-        button.setForeground(Color.WHITE);
-        button.setFocusPainted(false);
+        startButton = new JButton("Press to Continue");
+        startButton.setFont(new Font("Comic Sans MS", Font.BOLD, 36));
+        startButton.setBackground(Color.RED);
+        startButton.setForeground(Color.WHITE);
+        startButton.setFocusPainted(false);
         buttonConstraint = new GridBagConstraints();
         buttonConstraint.anchor = GridBagConstraints.CENTER;
         buttonConstraint.fill = GridBagConstraints.HORIZONTAL;
@@ -54,9 +82,14 @@ public class CustomGUI {
         buttonConstraint.ipady = 100;
         buttonConstraint.gridx = 0;
         buttonConstraint.gridy = 1;
-        panel.add(button, buttonConstraint);
+        startPanel.add(startButton, buttonConstraint);
+    }
 
-        frame.setVisible(true);
+    private void protoPanelInitialize(int windowSize, int aspectLength, int aspectHeight){
+        protoPanel.setLayout(new GridBagLayout());
+        protoPanel.setSize(new Dimension(setAspectRatioLength(aspectLength)*setWindowSize(windowSize), setAspectRatioHeight(aspectHeight)*setWindowSize(windowSize)));
+        protoPanel.setBackground(Color.BLACK);
+        
     }
 
     private int setWindowSize(int size){
