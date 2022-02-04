@@ -56,7 +56,7 @@ public class CustomGUI {
         textFieldConstraint = new GridBagConstraints();
         cl = new CardLayout();
 
-        InputStream is = CustomGUI.class.getResourceAsStream("TwCenMTStd.otf");
+        is = CustomGUI.class.getResourceAsStream("TwCenMTStd.otf");
         try {
             font = Font.createFont(Font.TRUETYPE_FONT, is);
         } catch (FontFormatException e) {
