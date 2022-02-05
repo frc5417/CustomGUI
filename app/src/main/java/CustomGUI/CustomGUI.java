@@ -25,7 +25,9 @@ public class CustomGUI {
     
     private JPanel startPanel;
     private JLabel startLabel;
+    private JLabel teamLabel;
     private JButton startButton;
+    private JTextField startTextField;
 
     private JPanel protoPanel;
     private JLabel protoLabel;
@@ -38,6 +40,8 @@ public class CustomGUI {
     private GridBagConstraints buttonConstraint;
     private GridBagConstraints textFieldConstraint;
 
+    private String teamInfoString;
+    private int teamInfoInt;
     private String motorInfoString;
     private int motorInfoInt;
 
@@ -47,7 +51,6 @@ public class CustomGUI {
 
     CustomGUI(int windowSize, int aspectLength, int aspectHeight){
         client = new NetworkTableClient();
-        client.startClient(5417);
         frame = new JFrame();
         switchPanel = new JPanel();
         startPanel = new JPanel();
@@ -82,6 +85,9 @@ public class CustomGUI {
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
+                teamInfoString = startTextField.getText();
+                teamInfoInt = Integer.parseInt(teamInfoString);
+                client.startClient(teamInfoInt);
                 cl.show(switchPanel, "PROTO");
             }
         });
@@ -116,19 +122,42 @@ public class CustomGUI {
         labelConstraint.gridy = 0;
         startPanel.add(startLabel, labelConstraint);
 
+        teamLabel = new JLabel("Enter Team Number", SwingConstants.CENTER);
+        teamLabel.setFont(font.deriveFont(24f));
+        teamLabel.setForeground(Color.WHITE);
+        labelConstraint.anchor = GridBagConstraints.CENTER;
+        labelConstraint.fill = GridBagConstraints.HORIZONTAL;
+        labelConstraint.ipadx = 50;
+        labelConstraint.ipady = 50;
+        labelConstraint.gridx = 0;
+        labelConstraint.gridy = 1;
+        startPanel.add(teamLabel, labelConstraint);
+
+        startTextField = new JTextField();
+        startTextField.setFont(font.deriveFont(24f));
+        startTextField.setBackground(Color.WHITE);
+        startTextField.setForeground(Color.BLACK);
+        textFieldConstraint.anchor = GridBagConstraints.CENTER;
+        textFieldConstraint.fill = GridBagConstraints.HORIZONTAL;
+        textFieldConstraint.ipadx = 0;
+        textFieldConstraint.ipady = 0;
+        textFieldConstraint.gridx = 0;
+        textFieldConstraint.gridy = 2;
+        startPanel.add(startTextField, textFieldConstraint);
+
         startButton = new JButton("Press to Continue");
-        startButton.setFont(font.deriveFont(36f));
+        startButton.setFont(font.deriveFont(24f));
         startButton.setBackground(Color.RED);
         startButton.setForeground(Color.WHITE);
         startButton.setOpaque(true);
         startButton.setFocusPainted(false);
         startButton.setBorderPainted(false);
-        buttonConstraint.anchor = GridBagConstraints.CENTER;
+        buttonConstraint.anchor = GridBagConstraints.PAGE_END;
         buttonConstraint.fill = GridBagConstraints.HORIZONTAL;
-        buttonConstraint.ipadx = 100;
-        buttonConstraint.ipady = 100;
+        buttonConstraint.ipadx = 20;
+        buttonConstraint.ipady = 20;
         buttonConstraint.gridx = 0;
-        buttonConstraint.gridy = 1;
+        buttonConstraint.gridy = 3;
         startPanel.add(startButton, buttonConstraint);
     }
 
@@ -149,7 +178,7 @@ public class CustomGUI {
         protoPanel.add(protoLabel, labelConstraint);
 
         motorTextField = new JTextField();
-        motorTextField.setFont(font.deriveFont(36f));
+        motorTextField.setFont(font.deriveFont(24f));
         motorTextField.setBackground(Color.WHITE);
         motorTextField.setForeground(Color.BLACK);
         textFieldConstraint.anchor = GridBagConstraints.CENTER;
@@ -161,7 +190,7 @@ public class CustomGUI {
         protoPanel.add(motorTextField, textFieldConstraint);
 
         enterButton = new JButton("Enter");
-        enterButton.setFont(font.deriveFont(36f));
+        enterButton.setFont(font.deriveFont(24f));
         enterButton.setBackground(Color.red);
         enterButton.setForeground(Color.WHITE);
         enterButton.setOpaque(true);
