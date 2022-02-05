@@ -47,6 +47,7 @@ public class CustomGUI {
 
     CustomGUI(int windowSize, int aspectLength, int aspectHeight){
         client = new NetworkTableClient();
+        client.startClient(5417);
         frame = new JFrame();
         switchPanel = new JPanel();
         startPanel = new JPanel();
@@ -89,10 +90,11 @@ public class CustomGUI {
             public void actionPerformed(ActionEvent evt) {
                 motorInfoString = motorTextField.getText();
                 motorInfoInt = Integer.parseInt(motorInfoString);
+                client.getEntry("Number of Motors:").setDouble(motorInfoInt);
             }
         });
 
-        client.getEntry("Number of Motors:").setDouble(motorInfoInt);
+        
        
         frame.setVisible(true);
     }
@@ -118,7 +120,9 @@ public class CustomGUI {
         startButton.setFont(font.deriveFont(36f));
         startButton.setBackground(Color.RED);
         startButton.setForeground(Color.WHITE);
+        startButton.setOpaque(true);
         startButton.setFocusPainted(false);
+        startButton.setBorderPainted(false);
         buttonConstraint.anchor = GridBagConstraints.CENTER;
         buttonConstraint.fill = GridBagConstraints.HORIZONTAL;
         buttonConstraint.ipadx = 100;
@@ -158,10 +162,13 @@ public class CustomGUI {
 
         enterButton = new JButton("Enter");
         enterButton.setFont(font.deriveFont(36f));
-        enterButton.setBackground(Color.RED);
+        enterButton.setBackground(Color.red);
         enterButton.setForeground(Color.WHITE);
+        enterButton.setOpaque(true);
         enterButton.setFocusPainted(false);
+        enterButton.setBorderPainted(false);
         buttonConstraint.anchor = GridBagConstraints.LINE_END;
+        buttonConstraint.fill = GridBagConstraints.HORIZONTAL;
         buttonConstraint.ipadx = 20;
         buttonConstraint.ipady = 0;
         buttonConstraint.gridx = 1;
