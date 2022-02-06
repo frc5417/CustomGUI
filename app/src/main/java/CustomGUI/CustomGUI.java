@@ -16,13 +16,22 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
+
+import edu.wpi.first.networktables.NetworkTable;
 
 public class CustomGUI {
     private JFrame frame;
     private JPanel switchPanel;
-    
+
+    private JPanel motorPanel;
+    private JScrollPane motorPane;
+    private DevicePanel[] devicePanels;
+    private JButton restartButton;
+
     private JPanel startPanel;
     private JLabel startLabel;
     private JLabel teamLabel;
@@ -47,7 +56,7 @@ public class CustomGUI {
 
     private NetworkTableClient client;
     private InputStream is;
-    private Font font;
+    public static Font font;
 
     CustomGUI(int windowSize, int aspectLength, int aspectHeight){
         client = new NetworkTableClient();
@@ -58,6 +67,15 @@ public class CustomGUI {
         labelConstraint = new GridBagConstraints();
         buttonConstraint = new GridBagConstraints();
         textFieldConstraint = new GridBagConstraints();
+        motorPanel = new JPanel();
+        motorPanel.setBackground(Color.BLACK);
+        motorPanel.setLayout(new GridBagLayout());
+        
+        motorPane = new JScrollPane(motorPanel);
+        motorPane.getVerticalScrollBar().setUnitIncrement(50);
+        motorPane.getHorizontalScrollBar().setUnitIncrement(50);
+        motorPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+
         cl = new CardLayout();
 
         is = CustomGUI.class.getResourceAsStream("TwCenMTStd.otf");
@@ -78,10 +96,9 @@ public class CustomGUI {
         switchPanel.setLayout(cl);
         switchPanel.add(startPanel, "START");
         switchPanel.add(protoPanel, "PROTO");
+        switchPanel.add(motorPane, "MOTOR");
         cl.show(switchPanel, "START");
         
-
-
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
@@ -97,11 +114,39 @@ public class CustomGUI {
                 motorInfoString = motorTextField.getText();
                 motorInfoInt = Integer.parseInt(motorInfoString);
                 client.getEntry("Number of Motors:").setDouble(motorInfoInt);
+                cl.show(switchPanel, "MOTOR");
+                devicePanels = new DevicePanel[motorInfoInt];
+                for (int i = 0; i < motorInfoInt; i++) {
+                    devicePanels[i] = (new DevicePanel(motorPanel, i, client));
+                }
+                restartButton = new JButton("Restart");
+                restartButton = CustomGUI.formatButton(restartButton, 32f);
+                restartButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent evt) {
+                        NetworkTable table = client.getTable();
+                        for (String key : table.getKeys()) {
+                            table.delete(key);
+                        }
+                        client.getEntry("reset").setBoolean(true);
+                        motorInfoInt = 0;
+                        motorPanel.removeAll();
+                        devicePanels = new DevicePanel[0];
+                        cl.show(switchPanel, "PROTO");
+                    }
+                });
+                GridBagConstraints restartConstraints = CustomGUI.formatConstraint(new GridBagConstraints(), GridBagConstraints.PAGE_START, GridBagConstraints.HORIZONTAL, 100, 20, 1, ((int)motorInfoInt / 3)+1);
+                if(motorInfoInt == 1) {
+                    restartConstraints.gridx = 0;
+                } else if(motorInfoInt == 2) {
+                    restartConstraints.gridx = 0;
+                    restartConstraints.gridwidth = 2;
+                }
+                motorPanel.add(restartButton, restartConstraints);
             }
         });
 
         
-       
         frame.setVisible(true);
     }
 
@@ -114,35 +159,20 @@ public class CustomGUI {
         startLabel = new JLabel("Welcome to the Prototype Dashboard", SwingConstants.CENTER);
         startLabel.setFont(font.deriveFont(36f));
         startLabel.setForeground(Color.WHITE);
-        labelConstraint.anchor = GridBagConstraints.PAGE_START;
-        labelConstraint.fill = GridBagConstraints.HORIZONTAL;
-        labelConstraint.ipadx = 100;
-        labelConstraint.ipady = 100;
-        labelConstraint.gridx = 0;
-        labelConstraint.gridy = 0;
+        labelConstraint = formatConstraint(labelConstraint, GridBagConstraints.PAGE_START, GridBagConstraints.HORIZONTAL, 100, 100, 0, 0);
         startPanel.add(startLabel, labelConstraint);
 
         teamLabel = new JLabel("Enter Team Number", SwingConstants.CENTER);
         teamLabel.setFont(font.deriveFont(24f));
         teamLabel.setForeground(Color.WHITE);
-        labelConstraint.anchor = GridBagConstraints.CENTER;
-        labelConstraint.fill = GridBagConstraints.HORIZONTAL;
-        labelConstraint.ipadx = 50;
-        labelConstraint.ipady = 50;
-        labelConstraint.gridx = 0;
-        labelConstraint.gridy = 1;
+        labelConstraint = formatConstraint(labelConstraint, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, 50, 50, 0, 1);
         startPanel.add(teamLabel, labelConstraint);
 
         startTextField = new JTextField();
         startTextField.setFont(font.deriveFont(24f));
         startTextField.setBackground(Color.WHITE);
         startTextField.setForeground(Color.BLACK);
-        textFieldConstraint.anchor = GridBagConstraints.CENTER;
-        textFieldConstraint.fill = GridBagConstraints.HORIZONTAL;
-        textFieldConstraint.ipadx = 0;
-        textFieldConstraint.ipady = 0;
-        textFieldConstraint.gridx = 0;
-        textFieldConstraint.gridy = 2;
+        textFieldConstraint = formatConstraint(textFieldConstraint, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, 0, 0, 0, 2);
         startPanel.add(startTextField, textFieldConstraint);
 
         startButton = new JButton("Press to Continue");
@@ -152,12 +182,7 @@ public class CustomGUI {
         startButton.setOpaque(true);
         startButton.setFocusPainted(false);
         startButton.setBorderPainted(false);
-        buttonConstraint.anchor = GridBagConstraints.PAGE_END;
-        buttonConstraint.fill = GridBagConstraints.HORIZONTAL;
-        buttonConstraint.ipadx = 20;
-        buttonConstraint.ipady = 20;
-        buttonConstraint.gridx = 0;
-        buttonConstraint.gridy = 3;
+        buttonConstraint = formatConstraint(buttonConstraint, GridBagConstraints.PAGE_END, GridBagConstraints.HORIZONTAL, 20, 20, 0, 3);
         startPanel.add(startButton, buttonConstraint);
     }
 
@@ -169,24 +194,14 @@ public class CustomGUI {
         protoLabel = new JLabel("Enter Number of Motors", SwingConstants.CENTER);
         protoLabel.setFont(font.deriveFont(36f));
         protoLabel.setForeground(Color.WHITE);
-        labelConstraint.anchor = GridBagConstraints.PAGE_START;
-        labelConstraint.fill = GridBagConstraints.HORIZONTAL;
-        labelConstraint.ipadx = 20;
-        labelConstraint.ipady = 20;
-        labelConstraint.gridx = 0;
-        labelConstraint.gridy = 0;
+        labelConstraint = formatConstraint(labelConstraint, GridBagConstraints.PAGE_START, GridBagConstraints.HORIZONTAL, 20, 20, 0, 0);
         protoPanel.add(protoLabel, labelConstraint);
 
         motorTextField = new JTextField();
         motorTextField.setFont(font.deriveFont(24f));
         motorTextField.setBackground(Color.WHITE);
         motorTextField.setForeground(Color.BLACK);
-        textFieldConstraint.anchor = GridBagConstraints.CENTER;
-        textFieldConstraint.fill = GridBagConstraints.HORIZONTAL;
-        textFieldConstraint.ipadx = 0;
-        textFieldConstraint.ipady = 0;
-        textFieldConstraint.gridx = 0;
-        textFieldConstraint.gridy = 1;
+        textFieldConstraint = formatConstraint(textFieldConstraint, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, 0, 0, 0, 1);
         protoPanel.add(motorTextField, textFieldConstraint);
 
         enterButton = new JButton("Enter");
@@ -196,12 +211,7 @@ public class CustomGUI {
         enterButton.setOpaque(true);
         enterButton.setFocusPainted(false);
         enterButton.setBorderPainted(false);
-        buttonConstraint.anchor = GridBagConstraints.LINE_END;
-        buttonConstraint.fill = GridBagConstraints.HORIZONTAL;
-        buttonConstraint.ipadx = 20;
-        buttonConstraint.ipady = 0;
-        buttonConstraint.gridx = 1;
-        buttonConstraint.gridy = 1;
+        buttonConstraint = formatConstraint(buttonConstraint, GridBagConstraints.LINE_END, GridBagConstraints.HORIZONTAL, 20, 0, 1, 1);
         protoPanel.add(enterButton, buttonConstraint);
     }
 
@@ -213,6 +223,39 @@ public class CustomGUI {
     }
     private int setAspectRatioHeight(int height){
         return height;
+    }
+
+    public static GridBagConstraints formatConstraint(GridBagConstraints buttonConstraint, int anchor, int fillType, int ipadx, int ipady, int gridx, int gridy) {
+        buttonConstraint.anchor = anchor;
+        buttonConstraint.fill = fillType;
+        buttonConstraint.ipadx = ipadx;
+        buttonConstraint.ipady = ipady;
+        buttonConstraint.gridx = gridx;
+        buttonConstraint.gridy = gridy;
+        return buttonConstraint;
+    }
+
+    public static JButton formatButton(JButton button, float fontSize) {
+        button.setFont(font.deriveFont(fontSize));
+        button.setBackground(Color.RED);
+        button.setForeground(Color.WHITE);
+        button.setOpaque(true);
+        button.setFocusPainted(false);
+        button.setBorderPainted(false);
+        return button;
+    }
+
+    public static JLabel formatLabel(JLabel label, float fontSize) {
+        label.setFont(CustomGUI.font.deriveFont(fontSize));
+        label.setForeground(Color.WHITE);
+        return label;
+    }
+
+    public static JTextField formatTextField(JTextField textField, float fontSize) {
+        textField.setFont(font.deriveFont(fontSize));
+        textField.setBackground(Color.WHITE);
+        textField.setForeground(Color.BLACK);
+        return textField;
     }
 
 }

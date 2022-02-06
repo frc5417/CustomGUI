@@ -23,5 +23,9 @@ public class NetworkTableClient {
     public NetworkTableEntry getEntry(String entry){
         return table.getEntry(entry);
     }
+
+    public NetworkTable getTable(){
+        return table;
+    }
     
 }
